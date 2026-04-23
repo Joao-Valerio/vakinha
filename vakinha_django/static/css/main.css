@@ -1,0 +1,30 @@
+/* Custom styles — Tailwind handles most of the UI */
+
+/* Smooth focus ring */
+*:focus-visible {
+  outline: none;
+  ring: 2px solid #10b981;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Progress bar animation */
+[style*="width:"] {
+  transition: width 0.6s ease-in-out;
+}
+
+/* Prose styling for campaign descriptions */
+.prose p { margin-bottom: 1em; }
+.prose strong { font-weight: 600; color: #111827; }

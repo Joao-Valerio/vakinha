@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Criar conta{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Criar sua conta</h1>
+      <p class="text-gray-500 text-sm">Já tem conta? <a href="{% url 'accounts:login' %}" class="text-primary-600 font-medium hover:underline">Entrar</a></p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            {% include "accounts/_field.html" with field=form.first_name %}
+            {% include "accounts/_field.html" with field=form.last_name %}
+          </div>
+          {% include "accounts/_field.html" with field=form.username %}
+          {% include "accounts/_field.html" with field=form.email %}
+          {% include "accounts/_field.html" with field=form.password1 %}
+          {% include "accounts/_field.html" with field=form.password2 %}
+        </div>
+        <button type="submit"
+          class="mt-6 w-full py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-colors">
+          Criar conta
+        </button>
+      </form>
+    </div>
+
+    <p class="text-xs text-center text-gray-400 mt-6">
+      Ao criar uma conta você concorda com nossos termos de uso.
+    </p>
+  </div>
+</div>
+{% endblock %}

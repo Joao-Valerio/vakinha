@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ campaign.title }}{% endblock %}
+{% block meta_description %}{{ campaign.description|truncatewords:20 }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- Main content -->
+    <div class="lg:col-span-2 space-y-6">
+      {% if campaign.image %}
+      <img src="{{ campaign.image.url }}" alt="{{ campaign.title }}"
+           class="w-full aspect-video object-cover rounded-2xl" />
+      {% else %}
+      <div class="w-full aspect-video bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl flex items-center justify-center">
+        <svg class="w-16 h-16 text-primary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      </div>
+      {% endif %}
+
+      <!-- Status badge -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full
+          {% if campaign.status == 'active' %}bg-green-100 text-green-700
+          {% elif campaign.status == 'completed' %}bg-blue-100 text-blue-700
+          {% elif campaign.status == 'cancelled' %}bg-red-100 text-red-700
+          {% else %}bg-gray-100 text-gray-600{% endif %}">
+          <span class="w-1.5 h-1.5 rounded-full
+            {% if campaign.status == 'active' %}bg-green-500
+            {% elif campaign.status == 'completed' %}bg-blue-500
+            {% elif campaign.status == 'cancelled' %}bg-red-500
+            {% else %}bg-gray-400{% endif %}"></span>
+          {{ campaign.get_status_display }}
+        </span>
+        {% if campaign.created_via_whatsapp %}
+        <span class="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">Criada via IA</span>
+        {% endif %}
+        {% if campaign.deadline %}
+        <span class="text-xs text-gray-500">Prazo: {{ campaign.deadline|date:"d/m/Y" }}</span>
+        {% endif %}
+      </div>
+
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">{{ campaign.title }}</h1>
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          <div class="w-7 h-7 bg-primary-100 rounded-full flex items-center justify-center text-primary-700 font-semibold text-xs">
+            {{ campaign.creator.first_name|first|upper }}{{ campaign.creator.last_name|first|upper }}
+          </div>
+          <span>por <strong class="text-gray-700">{{ campaign.creator.get_full_name|default:campaign.creator.username }}</strong></span>
+          <span class="text-gray-300">•</span>
+          <span>{{ campaign.created_at|date:"d/m/Y" }}</span>
+        </div>
+      </div>
+
+      <div class="prose prose-gray max-w-none text-gray-700 leading-relaxed">
+        {{ campaign.description|linebreaks }}
+      </div>
+
+      {% if campaign.beneficiary %}
+      <div class="bg-gray-50 rounded-xl p-5 space-y-2">
+        {% if campaign.beneficiary %}<p class="text-sm"><span class="font-medium text-gray-700">Para quem:</span> <span class="text-gray-600">{{ campaign.beneficiary }}</span></p>{% endif %}
+        {% if campaign.fund_usage %}<p class="text-sm"><span class="font-medium text-gray-700">Como será usado:</span> <span class="text-gray-600">{{ campaign.fund_usage }}</span></p>{% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Owner controls -->
+      {% if user == campaign.creator %}
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-5">
+        <h3 class="text-sm font-semibold text-amber-900 mb-3">Gerenciar campanha</h3>
+        <div class="flex flex-wrap gap-2">
+          <a href="{% url 'campaigns:edit' campaign.slug %}"
+             class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition">Editar</a>
+          <form method="post" action="{% url 'campaigns:toggle_status' campaign.slug %}">
+            {% csrf_token %}
+            {% if campaign.status == 'active' %}
+              <button name="action" value="pause" class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition">Pausar</button>
+              <button name="action" value="complete" class="px-4 py-2 text-sm font-medium bg-white border border-red-200 text-red-600 rounded-lg hover:border-red-300 transition">Encerrar</button>
+            {% elif campaign.status == 'draft' %}
+              <button name="action" value="activate" class="px-4 py-2 text-sm font-medium bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition">Ativar</button>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+
+      <!-- Post update -->
+      <div class="bg-white border border-gray-100 rounded-xl p-5">
+        <h3 class="text-sm font-semibold text-gray-900 mb-3">Nova atualização</h3>
+        <form method="post">
+          {% csrf_token %}
+          <textarea name="content" rows="3" required
+            class="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 resize-none"
+            placeholder="Compartilhe uma novidade com seus doadores..."></textarea>
+          <button type="submit" class="mt-3 px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-xl transition-colors">Publicar</button>
+        </form>
+      </div>
+      {% endif %}
+
+      <!-- Updates timeline -->
+      {% if updates %}
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Atualizações ({{ updates.count }})</h2>
+        <div class="space-y-4">
+          {% for update in updates %}
+          <div class="border-l-2 border-primary-200 pl-4 py-1">
+            <p class="text-sm text-gray-700 leading-relaxed">{{ update.content|linebreaks }}</p>
+            <p class="text-xs text-gray-400 mt-1.5">{{ update.created_at|date:"d/m/Y" }} às {{ update.created_at|time:"H:i" }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Recent donations -->
+      {% if donations %}
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Doações recentes</h2>
+        <div class="space-y-2">
+          {% for donation in donations %}
+          <div class="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs font-semibold">
+                {{ donation.donor_name|first|upper }}
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-800">{{ donation.donor_name }}</p>
+                {% if donation.message %}<p class="text-xs text-gray-400">"{{ donation.message|truncatewords:10 }}"</p>{% endif %}
+              </div>
+            </div>
+            <span class="text-sm font-semibold text-primary-600">R$ {{ donation.amount|floatformat:2 }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="lg:col-span-1">
+      <div class="sticky top-24">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div class="mb-5">
+            <div class="flex justify-between text-sm font-medium text-gray-700 mb-2">
+              <span>R$ {{ campaign.raised|floatformat:2|intcomma }}</span>
+              <span class="text-gray-400">de R$ {{ campaign.goal|floatformat:2|intcomma }}</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2 mb-2">
+              <div class="bg-primary-500 h-2 rounded-full transition-all" style="width: {{ campaign.progress_percent }}%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-400">
+              <span>{{ campaign.progress_percent|floatformat:1 }}% da meta</span>
+              <span>{{ campaign.donors_count }} doador{{ campaign.donors_count|pluralize:"es" }}</span>
+            </div>
+          </div>
+
+          {% if campaign.status == 'active' %}
+          <a href="{% url 'payments:donate' campaign.slug %}"
+             class="block w-full text-center py-3.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-primary-100">
+            Quero doar agora
+          </a>
+          <p class="text-xs text-center text-gray-400 mt-3">
+            Pagamento seguro via MercadoPago.<br/>PIX, cartão ou boleto.
+          </p>
+          {% else %}
+          <div class="text-center py-3 bg-gray-50 rounded-xl text-sm text-gray-500">
+            Campanha {{ campaign.get_status_display|lower }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

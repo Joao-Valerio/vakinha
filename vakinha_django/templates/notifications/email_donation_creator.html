@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><title>Nova doação recebida</title></head>
+<body style="font-family: Inter, sans-serif; background: #f9fafb; margin: 0; padding: 0;">
+<div style="max-width: 480px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e5e7eb;">
+  <div style="background: #10b981; padding: 32px 40px;">
+    <h1 style="color: white; font-size: 22px; margin: 0; font-weight: 700;">Vakinha IA</h1>
+  </div>
+  <div style="padding: 40px;">
+    <h2 style="color: #111827; font-size: 18px; margin: 0 0 12px;">🎉 Nova doação recebida!</h2>
+    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 24px;">
+      {% if donation.anonymous %}Alguém{% else %}{{ donation.donor_name }}{% endif %}
+      fez uma doação de <strong style="color: #10b981; font-size: 16px;">R$ {{ donation.amount|floatformat:2 }}</strong>
+      para sua campanha.
+    </p>
+    {% if donation.message %}
+    <div style="background: #f0fdf4; border-left: 3px solid #10b981; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+      <p style="margin: 0; font-size: 13px; color: #065f46; font-style: italic;">"{{ donation.message }}"</p>
+    </div>
+    {% endif %}
+    <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+      <p style="margin: 0 0 4px; font-size: 12px; color: #9ca3af;">Total arrecadado</p>
+      <p style="margin: 0; font-size: 20px; font-weight: 700; color: #111827;">R$ {{ campaign.raised|floatformat:2 }}</p>
+      <p style="margin: 4px 0 0; font-size: 12px; color: #9ca3af;">de R$ {{ campaign.goal|floatformat:2 }} ({{ campaign.progress_percent|floatformat:0 }}%)</p>
+    </div>
+  </div>
+  <div style="padding: 20px 40px; border-top: 1px solid #f3f4f6; text-align: center;">
+    <p style="color: #9ca3af; font-size: 12px; margin: 0;">Vakinha IA · Plataforma de arrecadação coletiva</p>
+  </div>
+</div>
+</body>
+</html>

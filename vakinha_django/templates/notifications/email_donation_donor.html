@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><title>Doação confirmada</title></head>
+<body style="font-family: Inter, sans-serif; background: #f9fafb; margin: 0; padding: 0;">
+<div style="max-width: 480px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e5e7eb;">
+  <div style="background: #10b981; padding: 32px 40px;">
+    <h1 style="color: white; font-size: 22px; margin: 0; font-weight: 700;">Vakinha IA</h1>
+  </div>
+  <div style="padding: 40px;">
+    <h2 style="color: #111827; font-size: 18px; margin: 0 0 12px;">Obrigado pela sua doação! 💚</h2>
+    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 24px;">
+      Sua doação de <strong style="color: #111827;">R$ {{ donation.amount|floatformat:2 }}</strong> para a campanha
+      <strong style="color: #111827;">{{ campaign.title }}</strong> foi registrada com sucesso.
+    </p>
+    <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+      <p style="margin: 0 0 8px; font-size: 13px; color: #9ca3af;">Campanha</p>
+      <p style="margin: 0; font-size: 14px; font-weight: 600; color: #111827;">{{ campaign.title }}</p>
+    </div>
+    <a href="{{ campaign_url }}" style="display: inline-block; background: #10b981; color: white; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600;">Ver campanha</a>
+  </div>
+  <div style="padding: 20px 40px; border-top: 1px solid #f3f4f6; text-align: center;">
+    <p style="color: #9ca3af; font-size: 12px; margin: 0;">Vakinha IA · Plataforma de arrecadação coletiva</p>
+  </div>
+</div>
+</body>
+</html>

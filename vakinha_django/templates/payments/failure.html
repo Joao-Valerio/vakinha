@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Pagamento não concluído{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center py-12 px-4">
+  <div class="text-center max-w-md">
+    <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+      <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-3">Pagamento não concluído</h1>
+    <p class="text-gray-500 mb-8">Não se preocupe! Nenhum valor foi cobrado. Você pode tentar novamente a qualquer momento.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      {% if donation %}<a href="{% url 'payments:donate' donation.campaign.slug %}" class="px-6 py-2.5 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-xl transition-colors">Tentar novamente</a>{% endif %}
+      <a href="{% url 'campaigns:list' %}" class="px-6 py-2.5 text-sm font-semibold text-gray-700 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">Ver campanhas</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

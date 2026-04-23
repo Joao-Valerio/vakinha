@@ -1,0 +1,39 @@
+{% load humanize %}
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden group">
+  {% if campaign.image %}
+  <div class="aspect-video overflow-hidden">
+    <img src="{{ campaign.image.url }}" alt="{{ campaign.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+  </div>
+  {% else %}
+  <div class="aspect-video bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center">
+    <svg class="w-10 h-10 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+  </div>
+  {% endif %}
+  <div class="p-5">
+    <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+      <a href="{{ campaign.get_absolute_url }}">{{ campaign.title }}</a>
+    </h3>
+    <p class="text-sm text-gray-500 line-clamp-2 mb-4">{{ campaign.description }}</p>
+
+    <!-- Progress bar -->
+    <div class="mb-3">
+      <div class="flex justify-between text-xs font-medium text-gray-600 mb-1.5">
+        <span>R$ {{ campaign.raised|floatformat:2|intcomma }}</span>
+        <span>{{ campaign.progress_percent|floatformat:0 }}%</span>
+      </div>
+      <div class="w-full bg-gray-100 rounded-full h-1.5">
+        <div class="bg-primary-500 h-1.5 rounded-full transition-all"
+             style="width: {{ campaign.progress_percent }}%"></div>
+      </div>
+      <div class="flex justify-between text-xs text-gray-400 mt-1">
+        <span>{{ campaign.donors_count }} doador{{ campaign.donors_count|pluralize:"es" }}</span>
+        <span>meta: R$ {{ campaign.goal|floatformat:2|intcomma }}</span>
+      </div>
+    </div>
+
+    <a href="{% url 'payments:donate' campaign.slug %}"
+       class="mt-2 block w-full text-center text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 py-2.5 rounded-xl transition-colors">
+      Quero doar
+    </a>
+  </div>
+</div>

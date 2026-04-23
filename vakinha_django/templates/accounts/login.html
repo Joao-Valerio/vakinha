@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Entrar{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4">
+  <div class="w-full max-w-sm">
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Bem-vindo(a) de volta</h1>
+      <p class="text-gray-500 text-sm">Não tem conta? <a href="{% url 'accounts:signup' %}" class="text-primary-600 font-medium hover:underline">Criar agora</a></p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="space-y-4">
+          {% include "accounts/_field.html" with field=form.username %}
+          {% include "accounts/_field.html" with field=form.password %}
+        </div>
+        {% if form.non_field_errors %}
+        <p class="mt-3 text-sm text-red-600 bg-red-50 px-4 py-3 rounded-xl">
+          {{ form.non_field_errors|first }}
+        </p>
+        {% endif %}
+        <button type="submit"
+          class="mt-6 w-full py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-colors">
+          Entrar
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

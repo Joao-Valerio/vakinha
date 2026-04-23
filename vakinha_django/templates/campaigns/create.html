@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Nova Campanha{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Criar campanha</h1>
+    <p class="text-gray-500 text-sm">Preencha as informações abaixo para criar sua campanha de arrecadação.</p>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <div class="space-y-5">
+        {% include "campaigns/_form_fields.html" %}
+      </div>
+      <div class="mt-8 flex gap-3 justify-end">
+        <a href="{% url 'campaigns:list' %}" class="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:border-gray-300 transition">Cancelar</a>
+        <button type="submit" class="px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-xl transition-colors">
+          Publicar campanha
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

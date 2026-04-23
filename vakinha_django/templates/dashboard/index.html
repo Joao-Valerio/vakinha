@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Olá, {{ user.first_name|default:user.username }} 👋</h1>
+      <p class="text-sm text-gray-500 mt-1">Aqui está o resumo das suas campanhas</p>
+    </div>
+    <a href="{% url 'campaigns:create' %}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-xl transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Nova campanha
+    </a>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-2xl border border-gray-100 p-5">
+      <p class="text-xs font-medium text-gray-400 mb-1 uppercase tracking-wide">Total arrecadado</p>
+      <p class="text-2xl font-bold text-gray-900">R$ {{ total_raised|floatformat:2|intcomma }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5">
+      <p class="text-xs font-medium text-gray-400 mb-1 uppercase tracking-wide">Doações</p>
+      <p class="text-2xl font-bold text-gray-900">{{ total_donations }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5">
+      <p class="text-xs font-medium text-gray-400 mb-1 uppercase tracking-wide">Campanhas ativas</p>
+      <p class="text-2xl font-bold text-gray-900">{{ active_campaigns }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5">
+      <p class="text-xs font-medium text-gray-400 mb-1 uppercase tracking-wide">Doadores únicos</p>
+      <p class="text-2xl font-bold text-gray-900">{{ total_donors }}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Chart -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+      <h2 class="text-sm font-semibold text-gray-900 mb-4">Doações nos últimos 30 dias</h2>
+      {% if chart_labels != "[]" %}
+      <canvas id="donationsChart" height="100"></canvas>
+      {% else %}
+      <div class="h-40 flex items-center justify-center text-sm text-gray-400">
+        Nenhuma doação nos últimos 30 dias.
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Recent donations -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-6">
+      <h2 class="text-sm font-semibold text-gray-900 mb-4">Doações recentes</h2>
+      {% if recent_donations %}
+      <div class="space-y-3">
+        {% for donation in recent_donations %}
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-7 h-7 bg-primary-50 rounded-full flex items-center justify-center text-primary-700 text-xs font-bold flex-shrink-0">
+              {{ donation.donor_name|first|upper }}
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-gray-800 truncate">
+                {% if donation.anonymous %}Anônimo{% else %}{{ donation.donor_name }}{% endif %}
+              </p>
+              <p class="text-xs text-gray-400 truncate">{{ donation.campaign.title|truncatechars:20 }}</p>
+            </div>
+          </div>
+          <span class="text-xs font-semibold text-primary-600 ml-2 flex-shrink-0">R$ {{ donation.amount|floatformat:0 }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-sm text-gray-400 text-center py-8">Nenhuma doação ainda.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Campaigns table -->
+  {% if campaigns %}
+  <div class="mt-6 bg-white rounded-2xl border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-gray-900">Suas campanhas</h2>
+      <a href="{% url 'campaigns:create' %}" class="text-xs font-medium text-primary-600 hover:text-primary-700">+ Nova</a>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-xs font-medium text-gray-400 uppercase tracking-wide">
+          <tr>
+            <th class="px-6 py-3 text-left">Campanha</th>
+            <th class="px-6 py-3 text-left">Status</th>
+            <th class="px-6 py-3 text-right">Meta</th>
+            <th class="px-6 py-3 text-right">Arrecadado</th>
+            <th class="px-6 py-3 text-right">Progresso</th>
+            <th class="px-6 py-3 text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for stats in campaign_stats %}
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4">
+              <a href="{{ stats.campaign.get_absolute_url }}" class="font-medium text-gray-900 hover:text-primary-600 transition-colors line-clamp-1">
+                {{ stats.campaign.title }}
+              </a>
+              <p class="text-xs text-gray-400 mt-0.5">{{ stats.donations_count }} doação{{ stats.donations_count|pluralize:"ões" }}</p>
+            </td>
+            <td class="px-6 py-4">
+              <span class="inline-flex text-xs font-medium px-2.5 py-1 rounded-full
+                {% if stats.campaign.status == 'active' %}bg-green-100 text-green-700
+                {% elif stats.campaign.status == 'completed' %}bg-blue-100 text-blue-700
+                {% elif stats.campaign.status == 'cancelled' %}bg-red-100 text-red-700
+                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                {{ stats.campaign.get_status_display }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right text-gray-600">R$ {{ stats.campaign.goal|floatformat:0|intcomma }}</td>
+            <td class="px-6 py-4 text-right font-semibold text-gray-900">R$ {{ stats.total_raised|floatformat:0|intcomma }}</td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <div class="w-16 bg-gray-100 rounded-full h-1.5">
+                  <div class="bg-primary-500 h-1.5 rounded-full" style="width: {{ stats.campaign.progress_percent }}%"></div>
+                </div>
+                <span class="text-xs text-gray-500 w-8 text-right">{{ stats.campaign.progress_percent|floatformat:0 }}%</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <a href="{% url 'campaigns:edit' stats.campaign.slug %}" class="text-xs font-medium text-gray-500 hover:text-primary-600 transition-colors">Editar</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="mt-6 bg-white rounded-2xl border border-gray-100 p-12 text-center">
+    <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+      <svg class="w-7 h-7 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+    </div>
+    <h3 class="font-semibold text-gray-800 mb-2">Nenhuma campanha ainda</h3>
+    <p class="text-sm text-gray-500 mb-5">Crie sua primeira campanha e comece a arrecadar.</p>
+    <a href="{% url 'campaigns:create' %}" class="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-xl transition-colors">
+      Criar primeira campanha
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const labels = {{ chart_labels|safe }};
+const amounts = {{ chart_amounts|safe }};
+
+if (labels.length > 0) {
+  const ctx = document.getElementById('donationsChart');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Doações (R$)',
+          data: amounts,
+          backgroundColor: 'rgba(16, 185, 129, 0.15)',
+          borderColor: 'rgb(16, 185, 129)',
+          borderWidth: 2,
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `R$ ${ctx.parsed.y.toFixed(2)}`
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+          y: {
+            grid: { color: 'rgba(0,0,0,0.04)' },
+            ticks: { font: { size: 11 }, callback: v => `R$ ${v}` }
+          }
+        }
+      }
+    });
+  }
+}
+</script>
+{% endblock %}

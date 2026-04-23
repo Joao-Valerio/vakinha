@@ -1,0 +1,10 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "pip install -r requirements/production.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput"
+
+[deploy]
+startCommand = "gunicorn config.wsgi:application --workers 2 --timeout 120 --bind 0.0.0.0:$PORT"
+healthcheckPath = "/health/"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
