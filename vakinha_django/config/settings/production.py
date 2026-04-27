@@ -1,8 +1,30 @@
+from urllib.parse import urlparse
+
 from .base import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+_allowed_raw = os.environ.get("ALLOWED_HOSTS", "")
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in _allowed_raw.replace(";", ",").split(",")
+    if host.strip()
+]
+if os.environ.get("VERCEL") == "1" and ".vercel.app" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(".vercel.app")
+
+_csrf_raw = os.environ.get("CSRF_TRUSTED_ORIGINS", "").replace(";", ",")
+CSRF_TRUSTED_ORIGINS = [
+    o.strip().rstrip("/") for o in _csrf_raw.split(",") if o.strip()
+]
+_parsed_site = urlparse(SITE_URL)
+if (
+    os.environ.get("VERCEL") == "1"
+    and not CSRF_TRUSTED_ORIGINS
+    and _parsed_site.scheme == "https"
+    and _parsed_site.netloc
+):
+    CSRF_TRUSTED_ORIGINS = [f"{_parsed_site.scheme}://{_parsed_site.netloc}"]
 
 # Neon PostgreSQL — enforce SSL in production
 DATABASES = {

@@ -5,7 +5,13 @@ import sys
 
 
 def main():
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
+    # Na Vercel a variável VERCEL=1; produção deve ser usada no deploy serverless.
+    default = (
+        "config.settings.production"
+        if os.environ.get("VERCEL") == "1"
+        else "config.settings.development"
+    )
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", default)
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

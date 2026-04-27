@@ -1,0 +1,7 @@
+# Dependências do app Django (pasta vakinha_django).
+# Uso na raiz: python -m venv .venv  →  activate  →  pip install -r requirements.txt
+# Servidor: cd vakinha_django && python manage.py runserver
+
+-r vakinha_django/requirements/base.txt
+-r vakinha_django/requirements/production.txt
+-r vakinha_django/requirements/development.txt

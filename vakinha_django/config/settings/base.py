@@ -73,6 +73,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
 
 # Database — configured per environment, default Neon via DATABASE_URL
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
