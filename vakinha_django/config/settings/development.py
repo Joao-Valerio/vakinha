@@ -4,8 +4,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-# Use SQLite locally if DATABASE_URL not set
-if not DATABASE_URL:
+# USE_LOCAL_SQLITE=1 força SQLite. Com 0, usa DATABASE_URL (ex.: Neon) — não precisa de Railway
+_use_sqlite = os.environ.get("USE_LOCAL_SQLITE", "").lower() in ("1", "true", "yes")
+if _use_sqlite or not (DATABASE_URL or "").strip():
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -16,8 +17,11 @@ if not DATABASE_URL:
 # Console email backend for local dev
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# Celery eager mode for local dev (tasks run synchronously)
-CELERY_TASK_ALWAYS_EAGER = os.environ.get("CELERY_EAGER", "false").lower() == "true"
+# Sem Redis: Celery em modo “eager” (não exige serviço no Railway)
+_celery_eager = os.environ.get("CELERY_EAGER", "true").lower() in ("1", "true", "yes", "")
+CELERY_TASK_ALWAYS_EAGER = _celery_eager
+if CELERY_TASK_ALWAYS_EAGER:
+    CELERY_BROKER_URL = "memory://"
 
 try:
     import debug_toolbar  # noqa: F401

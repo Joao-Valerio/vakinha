@@ -3,9 +3,11 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
-load_dotenv()
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+# BASE_DIR = pasta vakinha_django
+_BASE_DIR = Path(__file__).resolve().parent.parent.parent
+load_dotenv(_BASE_DIR / ".env")
+load_dotenv(_BASE_DIR.parent / ".env", override=True)
+BASE_DIR = _BASE_DIR
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-change-me-in-production")
 
@@ -78,7 +80,9 @@ DATABASES = {
     "default": dj_database_url.config(
         default=DATABASE_URL or "sqlite:///db.sqlite3",
         conn_max_age=0,
-        ssl_require=False,
+        ssl_require=bool(
+            (DATABASE_URL or "").startswith("postgres")
+        ),
     )
 }
 
