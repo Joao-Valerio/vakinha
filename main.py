@@ -142,15 +142,15 @@ class CreateCampaignTool(Tool):
 # ========================================
 # TOOL: Publicar no site (COMENTADA - PRONTO PARA USAR)
 # ========================================
-"""
+
 class PublishToSiteTool(Tool):
     name = "publish_to_site"
     description = "Publica campanha no site oficial e retorna link público"
     
     def __call__(self, campaign_data: Dict[str, str]) -> str:
-        url = f"{SITE_API_URL}/campanhas"
+        url = f"{http://127.0.0.1:8000}/campanhas"
         headers = {
-            "Authorization": f"Bearer {SITE_API_TOKEN}",
+            "Authorization": f"Bearer {1234567890}",
             "Content-Type": "application/json"
         }
         payload = {
@@ -168,7 +168,6 @@ class PublishToSiteTool(Tool):
             return f"🚀 *Campanha publicada no site!*\n🔗 {data['public_url']}\n📊 ID: {data['id']}"
         else:
             return f"❌ Erro ao publicar: {response.text}"
-"""
 
 # ========================================
 # Função: Transcrever áudio (Groq Whisper)
