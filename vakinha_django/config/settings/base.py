@@ -159,6 +159,9 @@ EVOLUTION_TOKEN = os.environ.get("EVOLUTION_TOKEN", "")
 
 # AI Agent
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+# Limite/retries: ver .env.example (429 Too Many Requests no plano free)
+GEMINI_MAX_RETRIES = int(os.environ.get("GEMINI_MAX_RETRIES", "6"))
+GEMINI_RETRY_BASE_SECONDS = float(os.environ.get("GEMINI_RETRY_BASE_SECONDS", "2.0"))
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 AI_WEBHOOK_TOKEN = os.environ.get("AI_WEBHOOK_TOKEN", "change-me-secret-token")
 

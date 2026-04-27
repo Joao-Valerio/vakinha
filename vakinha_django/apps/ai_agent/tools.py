@@ -1,6 +1,6 @@
 import logging
-from typing import Dict
-from agno import Tool
+from typing import Any, Dict, List, Optional
+
 from apps.notifications.services import send_whatsapp_message
 
 logger = logging.getLogger(__name__)
@@ -45,107 +45,108 @@ REGRAS IMPORTANTES
 - Nunca finalize a campanha sem confirmar os dados principais
 
 ────────────────────
-SAÍDA ESTRUTURADA
+FERRAMENTAS
 ────────────────────
-Sempre que possível, extraia informações da mensagem do usuário e organize internamente nos seguintes campos:
-
-- campaign_reason
-- beneficiary
-- goal_value
-- deadline
-- fund_usage
-- campaign_stage
-
-────────────────────
-FINALIZAÇÃO
-────────────────────
-Quando todas as informações forem coletadas:
-
-1) Gere um TEXTO DE CAMPANHA claro e humano
-2) Resuma os dados principais
-3) Pergunte se o usuário deseja:
-   - Editar algo
-   - Publicar a campanha no site
-   - Criar uma mensagem curta para compartilhar
-
-────────────────────
-EXEMPLO DE RESPOSTA
-────────────────────
-"Entendi. Essa campanha é para ajudar sua mãe com o tratamento de saúde.
-Agora me conta: qual valor você precisa arrecadar para conseguir pagar esse tratamento?" """
+- Use a ferramenta de criar campanha somente quando o usuário confirmar que quer publicar e você tiver título, descrição/motivo, beneficiário e meta em valores claros.
+"""
 
 
-class SendWhatsAppTool(Tool):
-    name = "send_whatsapp_message"
-    description = "Envia mensagem de volta ao usuário no WhatsApp via Evolution API"
+def _create_campaign_from_dict(data: Dict[str, Any]) -> str:
+    from django.conf import settings
+    from django.contrib.auth.models import User
+    from apps.campaigns.models import Campaign
+    from apps.accounts.models import UserProfile
 
-    def __call__(self, remote_jid: str, message: str) -> str:
-        success = send_whatsapp_message(remote_jid, message)
-        if success:
-            return f"Mensagem enviada para {remote_jid}"
-        return f"Falha ao enviar mensagem para {remote_jid}"
+    jid = (data.get("whatsapp_jid") or "").strip()
 
+    creator = None
+    if jid:
+        try:
+            profile = UserProfile.objects.select_related("user").get(whatsapp_jid=jid)
+            creator = profile.user
+        except UserProfile.DoesNotExist:
+            pass
 
-class CreateCampaignTool(Tool):
-    name = "create_campaign"
-    description = (
-        "Cria campanha de vakinha no banco de dados e retorna ID/link público. "
-        "Use quando o usuário confirmar todos os dados e quiser publicar."
+    if creator is None:
+        creator = User.objects.filter(is_superuser=True).first()
+        if creator is None:
+            return "❌ Não foi possível criar a campanha: nenhum usuário (superuser) no sistema. Crie um admin no site."
+
+    try:
+        goal = float(data.get("goal_value") or 0)
+    except (TypeError, ValueError):
+        goal = 0.0
+
+    campaign = Campaign.objects.create(
+        title=data.get("title") or f"Campanha de {data.get('beneficiary', 'vakinha')}",
+        description=(data.get("description") or data.get("campaign_reason") or "").strip() or "Campanha criada via WhatsApp.",
+        goal=goal,
+        creator=creator,
+        status=Campaign.STATUS_ACTIVE,
+        beneficiary=(data.get("beneficiary") or "")[:200],
+        fund_usage=(data.get("fund_usage") or "")[:2000],
+        campaign_reason=(data.get("campaign_reason") or "")[:2000],
+        created_via_whatsapp=True,
+        whatsapp_jid=jid,
+    )
+    public_url = f"{settings.SITE_URL.rstrip('/')}/campanhas/{campaign.slug}/"
+    return (
+        f"✅ *Campanha criada com sucesso!*\n\n"
+        f"📋 *Título:* {campaign.title}\n"
+        f"💰 *Meta:* R$ {campaign.goal:.2f}\n"
+        f"🔗 *Link:* {public_url}\n\n"
+        f"Compartilhe o link com seus contatos para começar a receber doações!"
     )
 
-    def __call__(self, data: Dict[str, str]) -> str:
-        from django.contrib.auth.models import User
-        from apps.campaigns.models import Campaign
-        from django.conf import settings
 
-        jid = data.get("whatsapp_jid", "")
+def build_tools_for_session(remote_jid: str) -> List:
+    """
+    Ferramentas compatíveis com agno 2.x (funções com docstring, registradas no Agent).
+    """
+    if not remote_jid:
+        remote_jid = ""
 
-        # Find user by whatsapp_jid if possible
-        creator = None
-        if jid:
-            try:
-                from apps.accounts.models import UserProfile
-                profile = UserProfile.objects.select_related("user").get(whatsapp_jid=jid)
-                creator = profile.user
-            except Exception:
-                pass
+    def send_whatsapp_reply(message: str) -> str:
+        """Envia uma mensagem de texto para o usuário no WhatsApp (Evolution API). Use após formular a resposta ao usuário.
 
-        if creator is None:
-            creator = User.objects.filter(is_superuser=True).first()
-            if creator is None:
-                return "❌ Não foi possível criar a campanha: nenhum usuário associado ao WhatsApp."
+        Args:
+            message: Texto a enviar (pode usar formatação simples).
+        """
+        success = send_whatsapp_message(remote_jid, message)
+        if success:
+            return f"Mensagem enviada."
+        return "Falha ao enviar mensagem (verifique EVOLUTION_* no .env)."
 
-        try:
-            goal = float(data.get("goal_value", 0))
-        except (ValueError, TypeError):
-            goal = 0.0
+    def create_whatsapp_campaign(
+        title: str = "",
+        description: str = "",
+        campaign_reason: str = "",
+        beneficiary: str = "",
+        goal_value: str = "0",
+        deadline: str = "",
+        fund_usage: str = "",
+    ) -> str:
+        """Cria e publica a campanha no site. Chame somente após o usuário confirmar os dados e pedir para publicar.
 
-        campaign = Campaign.objects.create(
-            title=data.get("title") or f"Campanha de {data.get('beneficiary', 'vakinha')}",
-            description=data.get("description") or data.get("campaign_reason", ""),
-            goal=goal,
-            creator=creator,
-            status=Campaign.STATUS_ACTIVE,
-            beneficiary=data.get("beneficiary", ""),
-            fund_usage=data.get("fund_usage", ""),
-            campaign_reason=data.get("campaign_reason", ""),
-            created_via_whatsapp=True,
-            whatsapp_jid=jid,
-        )
+        Args:
+            title: Título curto da campanha
+            description: Descrição completa (pode ser igual ao motivo)
+            campaign_reason: Motivo / história
+            beneficiary: Para quem é a arrecadação
+            goal_value: Meta financeira (número, ex: 5000 ou 5000.00)
+            deadline: Prazo ou data relevante (texto)
+            fund_usage: Como o dinheiro será usado
+        """
+        _ = deadline  # guardado no modelo Campaign.deadline se precisar mapear depois
+        data: Dict[str, Any] = {
+            "title": title.strip(),
+            "description": (description or campaign_reason or "").strip(),
+            "campaign_reason": (campaign_reason or "").strip(),
+            "beneficiary": (beneficiary or "").strip(),
+            "goal_value": goal_value,
+            "fund_usage": (fund_usage or "").strip(),
+            "whatsapp_jid": remote_jid,
+        }
+        return _create_campaign_from_dict(data)
 
-        public_url = f"{settings.SITE_URL}/campanhas/{campaign.slug}/"
-        return (
-            f"✅ *Campanha criada com sucesso!*\n\n"
-            f"📋 *Título:* {campaign.title}\n"
-            f"💰 *Meta:* R$ {campaign.goal:.2f}\n"
-            f"🔗 *Link:* {public_url}\n\n"
-            f"Compartilhe o link com seus contatos para começar a receber doações!"
-        )
-
-
-class PublishToSiteTool(Tool):
-    name = "publish_to_site"
-    description = "Publica campanha no site oficial e retorna link público"
-
-    def __call__(self, campaign_data: Dict[str, str]) -> str:
-        return CreateCampaignTool()(campaign_data)
+    return [send_whatsapp_reply, create_whatsapp_campaign]
