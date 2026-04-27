@@ -1,5 +1,7 @@
 # Dependências consolidadas para Vercel
 django>=4.2
+celery
+redis
 gunicorn
 psycopg2-binary
 python-decouple
