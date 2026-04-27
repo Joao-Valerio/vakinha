@@ -1,3 +1,0 @@
-# Instalação em um comando (Railway/Vercel/pip direto na pasta do projeto).
--r requirements/base.txt
--r requirements/production.txt
