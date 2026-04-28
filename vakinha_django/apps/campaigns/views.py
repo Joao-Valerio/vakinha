@@ -3,24 +3,39 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
-from .models import Campaign, CampaignUpdate
+from .models import Campaign, CampaignUpdate, Category
 from .forms import CampaignForm, CampaignUpdateForm
 
 
 def campaign_list(request):
-    campaigns = Campaign.objects.filter(status=Campaign.STATUS_ACTIVE).select_related("creator")
-    query = request.GET.get("q", "")
+    campaigns = Campaign.objects.filter(status=Campaign.STATUS_ACTIVE).select_related(
+        "creator", "category"
+    )
+    query = request.GET.get("q", "").strip()
+    cat_slug = request.GET.get("categoria", "").strip()
+    categories = Category.objects.all()
     if query:
         campaigns = campaigns.filter(
             Q(title__icontains=query) | Q(description__icontains=query)
         )
+    if cat_slug:
+        campaigns = campaigns.filter(category__slug=cat_slug)
     paginator = Paginator(campaigns, 12)
     page = paginator.get_page(request.GET.get("page"))
-    return render(request, "campaigns/list.html", {"page_obj": page, "query": query})
+    return render(
+        request,
+        "campaigns/list.html",
+        {
+            "page_obj": page,
+            "query": query,
+            "categories": categories,
+            "current_category": cat_slug,
+        },
+    )
 
 
 def campaign_detail(request, slug):
-    campaign = get_object_or_404(Campaign, slug=slug)
+    campaign = get_object_or_404(Campaign.objects.select_related("category", "creator"), slug=slug)
     if campaign.status == Campaign.STATUS_DRAFT and campaign.creator != request.user:
         from django.http import Http404
         raise Http404

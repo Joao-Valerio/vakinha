@@ -5,7 +5,9 @@
     {% if field.field.required %}<span class="text-red-500 ml-0.5">*</span>{% endif %}
   </label>
 
-  {% if field.field.widget.input_type == 'textarea' or field.name in 'description,fund_usage,campaign_reason' %}
+  {% if field.name == 'category' %}
+    {{ field }}
+  {% elif field.field.widget.input_type == 'textarea' or field.name in 'description,fund_usage,campaign_reason' %}
     <textarea name="{{ field.html_name }}" id="{{ field.id_for_label }}"
       rows="{{ field.field.widget.attrs.rows|default:4 }}"
       placeholder="{{ field.field.widget.attrs.placeholder|default:'' }}"

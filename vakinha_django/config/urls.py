@@ -10,7 +10,11 @@ from apps.campaigns.models import Campaign
 
 def home_view(request):
     from django.shortcuts import render
-    campaigns = Campaign.objects.filter(status=Campaign.STATUS_ACTIVE).order_by("-created_at")[:6]
+    campaigns = (
+        Campaign.objects.filter(status=Campaign.STATUS_ACTIVE)
+        .select_related("category", "creator")
+        .order_by("-created_at")[:6]
+    )
     return render(request, "home.html", {"campaigns": campaigns})
 
 

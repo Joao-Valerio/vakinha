@@ -33,6 +33,9 @@
             {% else %}bg-gray-400{% endif %}"></span>
           {{ campaign.get_status_display }}
         </span>
+        {% if campaign.category %}
+        <span class="text-xs font-medium text-primary-700 bg-primary-50 px-2.5 py-1 rounded-full">{{ campaign.category.name }}</span>
+        {% endif %}
         {% if campaign.created_via_whatsapp %}
         <span class="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">Criada via IA</span>
         {% endif %}

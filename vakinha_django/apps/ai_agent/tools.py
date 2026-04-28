@@ -54,7 +54,7 @@ FERRAMENTAS
 def _create_campaign_from_dict(data: Dict[str, Any]) -> str:
     from django.conf import settings
     from django.contrib.auth.models import User
-    from apps.campaigns.models import Campaign
+    from apps.campaigns.models import Campaign, Category
     from apps.accounts.models import UserProfile
 
     jid = (data.get("whatsapp_jid") or "").strip()
@@ -77,11 +77,18 @@ def _create_campaign_from_dict(data: Dict[str, Any]) -> str:
     except (TypeError, ValueError):
         goal = 0.0
 
+    outros = Category.objects.filter(slug="outros").first()
+    slug_cat = (data.get("category_slug") or "").strip()
+    cat = Category.objects.filter(slug=slug_cat).first() if slug_cat else None
+    if cat is None:
+        cat = outros
+
     campaign = Campaign.objects.create(
         title=data.get("title") or f"Campanha de {data.get('beneficiary', 'vakinha')}",
         description=(data.get("description") or data.get("campaign_reason") or "").strip() or "Campanha criada via WhatsApp.",
         goal=goal,
         creator=creator,
+        category=cat,
         status=Campaign.STATUS_ACTIVE,
         beneficiary=(data.get("beneficiary") or "")[:200],
         fund_usage=(data.get("fund_usage") or "")[:2000],

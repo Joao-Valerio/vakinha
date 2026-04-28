@@ -5,6 +5,22 @@ from django.urls import reverse
 import uuid
 
 
+class Category(models.Model):
+    """Taxonomia opcional das campanhas (saúde, educação etc.)."""
+
+    name = models.CharField(max_length=80, verbose_name="Nome")
+    slug = models.SlugField(max_length=96, unique=True)
+    ordering = models.PositiveSmallIntegerField(default=0, db_index=True)
+
+    class Meta:
+        verbose_name = "Categoria"
+        verbose_name_plural = "Categorias"
+        ordering = ["ordering", "name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Campaign(models.Model):
     STATUS_DRAFT = "draft"
     STATUS_ACTIVE = "active"
@@ -27,6 +43,14 @@ class Campaign(models.Model):
     )
     creator = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="campaigns", verbose_name="Criador"
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="campaigns",
+        verbose_name="Categoria",
     )
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default=STATUS_DRAFT, verbose_name="Status"

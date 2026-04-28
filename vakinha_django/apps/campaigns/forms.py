@@ -1,5 +1,5 @@
 from django import forms
-from .models import Campaign, CampaignUpdate
+from .models import Campaign, CampaignUpdate, Category
 
 
 class CampaignForm(forms.ModelForm):
@@ -7,6 +7,7 @@ class CampaignForm(forms.ModelForm):
         model = Campaign
         fields = (
             "title",
+            "category",
             "description",
             "goal",
             "deadline",
@@ -16,6 +17,9 @@ class CampaignForm(forms.ModelForm):
             "campaign_reason",
         )
         widgets = {
+            "category": forms.Select(
+                attrs={"class": "w-full border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary-400 focus:border-transparent bg-white"}
+            ),
             "title": forms.TextInput(
                 attrs={"placeholder": "Ex: Tratamento de saúde da minha mãe"}
             ),
@@ -39,6 +43,7 @@ class CampaignForm(forms.ModelForm):
             ),
         }
         labels = {
+            "category": "Categoria",
             "title": "Título da Campanha",
             "description": "Descrição",
             "goal": "Meta (R$)",
@@ -48,6 +53,13 @@ class CampaignForm(forms.ModelForm):
             "fund_usage": "Como será usado o dinheiro",
             "campaign_reason": "Motivo da campanha",
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        fld = self.fields["category"]
+        fld.queryset = Category.objects.order_by("ordering", "name")
+        fld.required = True
+        fld.empty_label = "Escolha uma categoria…"
 
 
 class CampaignUpdateForm(forms.ModelForm):
