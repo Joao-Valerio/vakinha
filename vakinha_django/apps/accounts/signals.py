@@ -5,12 +5,11 @@ from .models import UserProfile
 
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+def user_profile_handler(sender, instance, created, **kwargs):
+    """Create or save user profile when user is saved."""
     if created:
         UserProfile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    if hasattr(instance, "profile"):
-        instance.profile.save()
+    else:
+        # Save profile if it exists
+        if hasattr(instance, "profile"):
+            instance.profile.save()

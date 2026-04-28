@@ -13,7 +13,7 @@ ALLOWED_HOSTS = [
 if os.environ.get("VERCEL") == "1" and ".vercel.app" not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(".vercel.app")
 
-_csrf_raw = os.environ.get("CSRF_TRUSTED_ORIGINS", "").replace(";", ",")
+_csrf_raw = os.environ.get("CSRF_TRUSTED_ORIGINS", SITE_URL).replace(";", ",")
 CSRF_TRUSTED_ORIGINS = [
     o.strip().rstrip("/") for o in _csrf_raw.split(",") if o.strip()
 ]

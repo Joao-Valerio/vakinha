@@ -19,7 +19,7 @@ from .services import create_preference, get_payment_info
 
 logger = logging.getLogger(__name__)
 
-PRESET_AMOUNTS = [10, 25, 50, 100, 250, 500]
+PRESET_AMOUNTS = settings.DONATION_PRESET_AMOUNTS
 
 
 def donate_view(request, slug):

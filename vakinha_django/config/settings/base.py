@@ -9,11 +9,18 @@ load_dotenv(_BASE_DIR / ".env")
 load_dotenv(_BASE_DIR.parent / ".env", override=True)
 BASE_DIR = _BASE_DIR
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-change-me-in-production")
+from django.core.exceptions import ImproperlyConfigured
+
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    raise ImproperlyConfigured(
+        "SECRET_KEY must be set as an environment variable for security. "
+        "Generate with: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'"
+    )
 
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -42,6 +49,53 @@ LOCAL_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# ============================================
+# PAGAMENTOS (MercadoPago)
+# ============================================
+MERCADOPAGO_ACCESS_TOKEN = os.environ.get("MERCADOPAGO_ACCESS_TOKEN", "")
+MERCADOPAGO_WEBHOOK_SECRET = os.environ.get("MERCADOPAGO_WEBHOOK_SECRET", "")
+
+if not MERCADOPAGO_ACCESS_TOKEN and not DEBUG:
+    import warnings
+    warnings.warn("MERCADOPAGO_ACCESS_TOKEN not configured - payments will fail", stacklevel=2)
+
+# ============================================
+# SITE & URLS
+# ============================================
+SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000")
+
+# ============================================
+# ARTIFICIAL INTELLIGENCE & LLMs
+# ============================================
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+GEMINI_MAX_RETRIES = int(os.environ.get("GEMINI_MAX_RETRIES", "6"))
+GEMINI_RETRY_BASE_SECONDS = float(os.environ.get("GEMINI_RETRY_BASE_SECONDS", "2.0"))
+GEMINI_NUM_HISTORY_RUNS = int(os.environ.get("GEMINI_NUM_HISTORY_RUNS", "2"))
+
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+
+# ============================================
+# EVOLUTION API (WhatsApp)
+# ============================================
+EVOLUTION_API_URL = os.environ.get("EVOLUTION_API_URL", "")
+EVOLUTION_INSTANCE = os.environ.get("EVOLUTION_INSTANCE", "")
+EVOLUTION_TOKEN = os.environ.get("EVOLUTION_TOKEN", "")
+
+if not all([EVOLUTION_API_URL, EVOLUTION_INSTANCE, EVOLUTION_TOKEN]) and not DEBUG:
+    import warnings
+    warnings.warn("Evolution API not fully configured - WhatsApp features will be limited", stacklevel=2)
+
+# ============================================
+# WEBHOOKS & SECURITY
+# ============================================
+AI_WEBHOOK_TOKEN = os.environ.get("AI_WEBHOOK_TOKEN", "")
+
+# ============================================
+# DONATIONS
+# ============================================
+DONATION_PRESET_AMOUNTS = [10, 25, 50, 100, 250, 500]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
