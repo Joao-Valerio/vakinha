@@ -11,7 +11,7 @@ BASE_DIR = _BASE_DIR
 
 from django.core.exceptions import ImproperlyConfigured
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY", "12345")
 if not SECRET_KEY:
     raise ImproperlyConfigured(
         "SECRET_KEY must be set as an environment variable for security. "
@@ -20,7 +20,17 @@ if not SECRET_KEY:
 
 DEBUG = False
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+#ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = [
+    "*",
+    "vakinha-494910.rj.r.appspot.com"
+    "*.appspot.com"
+    ]
+CSRF_TRUSTED_ORIGINS = [
+    "https://vakinha-494910.rj.r.appspot.com",
+    "https://localhost:8000",
+    "http://localhost:8000",
+]
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -154,7 +164,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "static_gcloud"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
