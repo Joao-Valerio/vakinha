@@ -1,0 +1,32 @@
+{# templates/components/button.html #}
+
+{% if variant == "primary" %}
+  {% with base_class="bg-primary-500 hover:bg-primary-600 text-white shadow-md shadow-accent-100" %}
+{% elif variant == "accent" %}
+  {% with base_class="bg-accent-500 hover:bg-accent-600 text-white shadow-lg shadow-accent-200" %}
+{% elif variant == "outline" %}
+  {% with base_class="border border-primary-500 text-primary-600 hover:bg-primary-50" %}
+{% elif variant == "ghost" %}
+  {% with base_class="text-primary-600 hover:bg-primary-100" %}
+{% else %}
+  {% with base_class="bg-sand-200 text-sand-900" %}
+{% endif %}
+
+<button
+  type="{{ type|default:'button' }}"
+  class="
+    inline-flex items-center justify-center
+    px-4 py-2 rounded-lg
+    font-medium
+    transition-all duration-200
+    focus:outline-none focus:ring-2 focus:ring-primary-400
+    {{ base_class }} {{ extra_class }}
+  "
+>
+  {% if icon %}
+    <i class="{{ icon }} mr-2"></i>
+  {% endif %}
+
+  {{ label }}
+</button>
+{% endwith %}
