@@ -66,3 +66,8 @@ package-lock.json
 
 # Railway
 .railway/
+
+DESIGN.md
+PRODUCT.md
+
+.impeccable/
