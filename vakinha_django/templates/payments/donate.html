@@ -10,7 +10,7 @@
     Voltar para a campanha
   </a>
 
-  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+  <div class="bg-white rounded-2xl border border-sand-200 shadow-sm p-8">
     <h1 class="text-xl font-bold text-gray-900 mb-1">Fazer uma doação</h1>
     <p class="text-sm text-gray-500 mb-8">Para: <span class="font-medium text-gray-700">{{ campaign.title }}</span></p>
 
@@ -24,7 +24,7 @@
           {% for amount in preset_amounts %}
           <label class="cursor-pointer">
             <input type="radio" name="amount" value="{{ amount }}" class="sr-only peer" />
-            <div class="peer-checked:bg-primary-500 peer-checked:text-white peer-checked:border-primary-500 border border-gray-200 rounded-xl py-3 text-center text-sm font-semibold text-gray-700 hover:border-primary-300 transition-all">
+            <div class="peer-checked:bg-primary-500 peer-checked:text-white peer-checked:border-primary-500 border border-sand-200 rounded-xl py-3 text-center text-sm font-semibold text-gray-700 hover:border-primary-300 transition-all">
               R$ {{ amount }}
             </div>
           </label>
@@ -38,7 +38,7 @@
         <div class="relative">
           <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">R$</span>
           <input type="number" name="custom_amount" id="custom_amount" min="1" step="0.01" placeholder="0,00"
-            class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition" />
+            class="w-full pl-10 pr-4 py-2.5 text-sm border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition" />
         </div>
       </div>
 
@@ -51,20 +51,20 @@
           <input type="text" name="donor_name" id="donor_name" required
             value="{% if user.is_authenticated %}{{ user.get_full_name }}{% endif %}"
             placeholder="Como você quer ser identificado"
-            class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 transition" />
+            class="w-full px-4 py-2.5 text-sm border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 transition" />
         </div>
         <div>
           <label for="donor_email" class="block text-sm font-medium text-gray-700 mb-1.5">Seu e-mail <span class="text-red-500">*</span></label>
           <input type="email" name="donor_email" id="donor_email" required
             value="{% if user.is_authenticated %}{{ user.email }}{% endif %}"
-            placeholder="para@receber.confirmacao.com"
-            class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 transition" />
+            placeholder="seu@email.com"
+            class="w-full px-4 py-2.5 text-sm border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 transition" />
         </div>
         <div>
           <label for="message" class="block text-sm font-medium text-gray-700 mb-1.5">Mensagem (opcional)</label>
           <textarea name="message" id="message" rows="2"
             placeholder="Deixe uma mensagem de apoio..."
-            class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 resize-none transition"></textarea>
+            class="w-full px-4 py-2.5 text-sm border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 resize-none transition"></textarea>
         </div>
         <label class="flex items-center gap-2.5 cursor-pointer">
           <input type="checkbox" name="anonymous" id="anonymous" class="w-4 h-4 rounded text-primary-500 focus:ring-primary-400" />
@@ -73,7 +73,7 @@
       </div>
 
       <button type="submit"
-        class="w-full py-3.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-primary-100">
+        class="w-full py-3.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-colors shadow-soft hover:shadow-card-hover">
         Continuar para pagamento →
       </button>
 

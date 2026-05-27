@@ -61,7 +61,7 @@
       </div>
 
       {% if campaign.beneficiary %}
-      <div class="bg-gray-50 rounded-xl p-5 space-y-2">
+      <div class="bg-sand-50 rounded-xl p-5 space-y-2">
         {% if campaign.beneficiary %}<p class="text-sm"><span class="font-medium text-gray-700">Para quem:</span> <span class="text-gray-600">{{ campaign.beneficiary }}</span></p>{% endif %}
         {% if campaign.fund_usage %}<p class="text-sm"><span class="font-medium text-gray-700">Como será usado:</span> <span class="text-gray-600">{{ campaign.fund_usage }}</span></p>{% endif %}
       </div>
@@ -87,7 +87,7 @@
       </div>
 
       <!-- Post update -->
-      <div class="bg-white border border-gray-100 rounded-xl p-5">
+      <div class="bg-white border border-sand-200 rounded-xl p-5">
         <h3 class="text-sm font-semibold text-gray-900 mb-3">Nova atualização</h3>
         <form method="post">
           {% csrf_token %}
@@ -105,7 +105,7 @@
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Atualizações ({{ updates.count }})</h2>
         <div class="space-y-4">
           {% for update in updates %}
-          <div class="border-l-2 border-primary-200 pl-4 py-1">
+          <div class="bg-primary-50 border border-primary-100 rounded-xl px-4 py-3">
             <p class="text-sm text-gray-700 leading-relaxed">{{ update.content|linebreaks }}</p>
             <p class="text-xs text-gray-400 mt-1.5">{{ update.created_at|date:"d/m/Y" }} às {{ update.created_at|time:"H:i" }}</p>
           </div>
@@ -120,9 +120,9 @@
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Doações recentes</h2>
         <div class="space-y-2">
           {% for donation in donations %}
-          <div class="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
+          <div class="flex items-center justify-between py-3 border-b border-sand-100 last:border-0">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs font-semibold">
+              <div class="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center text-primary-600 text-xs font-semibold">
                 {{ donation.donor_name|first|upper }}
               </div>
               <div>
@@ -141,7 +141,7 @@
     <!-- Sidebar -->
     <div class="lg:col-span-1">
       <div class="sticky top-24">
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div class="bg-white rounded-2xl border border-sand-200 shadow-sm p-6">
           <div class="mb-5">
             <div class="flex justify-between text-sm font-medium text-gray-700 mb-2">
               <span>R$ {{ campaign.raised|floatformat:2|intcomma }}</span>
@@ -165,7 +165,7 @@
             Pagamento seguro via MercadoPago.<br/>PIX, cartão ou boleto.
           </p>
           {% else %}
-          <div class="text-center py-3 bg-gray-50 rounded-xl text-sm text-gray-500">
+          <div class="text-center py-3 bg-sand-50 rounded-xl text-sm text-sand-500">
             Campanha {{ campaign.get_status_display|lower }}
           </div>
           {% endif %}

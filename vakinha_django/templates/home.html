@@ -11,32 +11,64 @@
     <div class="text-center max-w-3xl mx-auto">
       <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-700 bg-primary-50 px-3 py-1 rounded-full mb-6">
         <span class="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
-        Com o poder da Inteligência Artificial
+        Responda 3 perguntas no WhatsApp e publique
       </span>
       <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight mb-6">
         Crie sua vakinha e<br />
         <span class="text-primary-500">transforme vidas</span>
       </h1>
-      <p class="text-lg text-gray-500 mb-10 leading-relaxed">
-        Nossa IA te ajuda a criar uma campanha de arrecadação completa via WhatsApp em minutos.
-        Receba doações via PIX, cartão e boleto.
+      <p class="text-lg text-gray-500 mb-8 leading-relaxed">
+        Você cria sua campanha em poucos minutos com orientação da nossa IA no WhatsApp.
+        Depois é só compartilhar e receber via PIX, cartão e boleto.
       </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <div class="flex flex-col gap-4 items-center">
         <a href="{% url 'campaigns:create' %}" class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-primary-200 hover:shadow-primary-300">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          Criar campanha grátis
+          Começar minha campanha
         </a>
-        <a href="{% url 'campaigns:list' %}" class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white border border-gray-200 hover:border-primary-300 text-gray-700 font-semibold rounded-xl transition-all">
-          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          Ver campanhas
+        <p class="text-sm text-gray-500">Leva 3 minutos e você não precisa de cartão para começar.</p>
+        <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-medium">
+          <span class="px-3 py-1 rounded-full bg-sand-100 text-gray-700 border border-gray-200">Sem custo para criar</span>
+          <span class="px-3 py-1 rounded-full bg-sand-100 text-gray-700 border border-gray-200">Pagamentos seguros</span>
+          <span class="px-3 py-1 rounded-full bg-sand-100 text-gray-700 border border-gray-200">Suporte humano</span>
+        </div>
+        <a href="{% url 'campaigns:list' %}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-800 mt-1">
+          Ver campanhas para se inspirar
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </a>
       </div>
     </div>
   </div>
 </section>
 
+<!-- How it works -->
+<section class="bg-white pb-16">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-sand-100 border border-gray-200 rounded-2xl p-6 sm:p-8">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6">Como funciona em 3 passos</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-500 text-white font-bold text-sm mb-3">1</span>
+          <h3 class="font-semibold text-gray-900 mb-1">Conte sua causa</h3>
+          <p class="text-sm text-gray-600">No WhatsApp, a IA faz perguntas simples e monta o texto com você.</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-500 text-white font-bold text-sm mb-3">2</span>
+          <h3 class="font-semibold text-gray-900 mb-1">Publique com confiança</h3>
+          <p class="text-sm text-gray-600">Revise, ajuste se quiser e coloque sua campanha no ar em poucos minutos.</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-500 text-white font-bold text-sm mb-3">3</span>
+          <h3 class="font-semibold text-gray-900 mb-1">Receba doações</h3>
+          <p class="text-sm text-gray-600">Aceite PIX, cartão e boleto e acompanhe quanto entrou e quanto falta.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Features -->
-<section class="bg-gray-200 py-20">
+<section class="bg-sand-100 py-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-14">
       <h2 class="text-3xl font-bold text-gray-900 mb-3">Simples, rápido e seguro</h2>
@@ -61,8 +93,8 @@
         <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-5">
           <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         </div>
-        <h3 class="font-semibold text-gray-900 mb-2">Dashboard completo</h3>
-        <p class="text-sm text-gray-500 leading-relaxed">Acompanhe doações, métricas e progresso das suas campanhas em tempo real com gráficos detalhados.</p>
+        <h3 class="font-semibold text-gray-900 mb-2">Acompanhamento simples</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Veja quanto já entrou, quanto falta para a meta e as últimas doações em um painel fácil de entender.</p>
       </div>
     </div>
   </div>
@@ -89,9 +121,9 @@
 <section class="bg-primary-500 py-20">
   <div class="max-w-3xl mx-auto px-4 text-center">
     <h2 class="text-3xl font-bold text-white mb-4">Pronto para começar?</h2>
-    <p class="text-primary-100 mb-8 text-lg">Crie sua campanha gratuitamente e comece a receber doações hoje mesmo.</p>
-    <a href="{% url 'accounts:signup' %}" class="inline-flex items-center gap-2 px-8 py-3.5 bg-white hover:bg-gray-50 text-primary-600 font-semibold rounded-xl transition-all shadow-lg">
-      Criar conta grátis
+    <p class="text-primary-100 mb-8 text-lg">Comece sua campanha agora, sem custo para criar, com apoio em cada etapa.</p>
+    <a href="{% url 'campaigns:create' %}" class="inline-flex items-center gap-2 px-8 py-3.5 bg-white hover:bg-gray-50 text-primary-600 font-semibold rounded-xl transition-all shadow-lg">
+      Começar minha campanha
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
     </a>
   </div>
