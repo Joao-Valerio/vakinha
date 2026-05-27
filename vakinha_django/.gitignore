@@ -67,7 +67,9 @@ package-lock.json
 # Railway
 .railway/
 
+# Documentação e design do projeto
 DESIGN.md
 PRODUCT.md
 
+# Ferramentas externas
 .impeccable/
