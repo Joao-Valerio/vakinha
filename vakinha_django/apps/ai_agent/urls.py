@@ -5,4 +5,5 @@ app_name = "ai_agent"
 
 urlpatterns = [
     path("webhook/<str:token>/", views.whatsapp_webhook, name="webhook"),
+    path("webhook/<str:token>", views.whatsapp_webhook),
 ]

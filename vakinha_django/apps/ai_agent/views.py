@@ -8,6 +8,18 @@ from .utils import resolve_reply_jid
 
 logger = logging.getLogger(__name__)
 
+def _coerce_bool(value) -> bool:
+    """
+    Robust bool coercion for webhook payloads that may serialize booleans as strings.
+    """
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value != 0
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+    return bool(value)
+
 
 def _extract_message_text(body: dict) -> str:
     """
@@ -54,12 +66,13 @@ def whatsapp_webhook(request, token: str):
     try:
         body = data.get("body", data)
         instance_key = body.get("instance", settings.EVOLUTION_INSTANCE)
-        key_data = body.get("data", {}).get("key", {})
+        data_node = body.get("data", {}) or {}
+        key_data = data_node.get("key", {}) or body.get("key", {}) or {}
         remote_jid = resolve_reply_jid(key_data)
         message_id = key_data.get("id", "")
-        message_type = body.get("data", {}).get("messageType", "conversation")
+        message_type = data_node.get("messageType", "conversation")
         message_text = _extract_message_text(body)
-        from_me = key_data.get("fromMe", False)
+        from_me = _coerce_bool(key_data.get("fromMe", False))
 
         if not remote_jid:
             return JsonResponse({"status": "no_jid"}, status=200)
