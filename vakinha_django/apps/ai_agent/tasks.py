@@ -16,6 +16,7 @@ def process_whatsapp_message(self, remote_jid: str, message: str):
     Runs the Agno AI agent for a given WhatsApp message.
     The agent may call tools (SendWhatsApp, CreateCampaign) as needed.
     """
+    from apps.notifications.services import send_whatsapp_message
     from .services import create_agent, run_agent_text
 
     logger.info("Processing WhatsApp message from %s", remote_jid)
@@ -24,6 +25,10 @@ def process_whatsapp_message(self, remote_jid: str, message: str):
         agent = create_agent(remote_jid)
         response = run_agent_text(agent, message, session_id=remote_jid)
         logger.info("Agent responded to %s: %.80s...", remote_jid, response)
+        if response and response.strip():
+            sent = send_whatsapp_message(remote_jid, response)
+            if not sent:
+                logger.warning("Failed to send agent response back to %s", remote_jid)
         return response
     except Exception as exc:
         logger.error("Agent failed for %s: %s", remote_jid, exc)
@@ -39,6 +44,7 @@ def process_whatsapp_message(self, remote_jid: str, message: str):
 )
 def process_audio_message(self, remote_jid: str, instance: str, message_id: str):
     """Transcribes audio then passes text to the AI agent."""
+    from apps.notifications.services import send_whatsapp_message
     from .services import transcribe_audio, create_agent, run_agent_text
 
     logger.info("Transcribing audio message %s from %s", message_id, remote_jid)
@@ -52,4 +58,8 @@ def process_audio_message(self, remote_jid: str, instance: str, message_id: str)
     agent = create_agent(remote_jid)
     response = run_agent_text(agent, text, session_id=remote_jid)
     logger.info("Agent responded to audio from %s", remote_jid)
+    if response and response.strip():
+        sent = send_whatsapp_message(remote_jid, response)
+        if not sent:
+            logger.warning("Failed to send audio agent response back to %s", remote_jid)
     return response

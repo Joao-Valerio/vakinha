@@ -50,6 +50,21 @@ CSRF_COOKIE_SECURE = True
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# Celery — sem Redis/worker externo (ex.: Vercel serverless)
+_celery_eager_raw = os.environ.get("CELERY_EAGER", "").strip()
+if _celery_eager_raw:
+    _celery_eager = _celery_eager_raw.lower() in ("1", "true", "yes")
+else:
+    # Na Vercel, sem REDIS_URL: executa tasks na mesma requisição do webhook
+    _celery_eager = (
+        os.environ.get("VERCEL") == "1"
+        and not (os.environ.get("REDIS_URL") or "").strip()
+    )
+
+CELERY_TASK_ALWAYS_EAGER = _celery_eager
+if CELERY_TASK_ALWAYS_EAGER:
+    CELERY_BROKER_URL = "memory://"
+
 # Sentry error tracking (optional)
 SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 if SENTRY_DSN:

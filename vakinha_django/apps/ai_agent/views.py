@@ -7,6 +7,31 @@ from django.views.decorators.http import require_POST
 logger = logging.getLogger(__name__)
 
 
+def _extract_message_text(body: dict) -> str:
+    """
+    Extracts user text from common Evolution/WhatsApp message payload variants.
+    """
+    message = body.get("data", {}).get("message", {}) or {}
+    conversation = (message.get("conversation") or "").strip()
+    if conversation:
+        return conversation
+
+    extended = message.get("extendedTextMessage", {}) or {}
+    extended_text = (extended.get("text") or "").strip()
+    if extended_text:
+        return extended_text
+
+    image_caption = ((message.get("imageMessage", {}) or {}).get("caption") or "").strip()
+    if image_caption:
+        return image_caption
+
+    video_caption = ((message.get("videoMessage", {}) or {}).get("caption") or "").strip()
+    if video_caption:
+        return video_caption
+
+    return ""
+
+
 @csrf_exempt
 @require_POST
 def whatsapp_webhook(request, token: str):
@@ -31,7 +56,7 @@ def whatsapp_webhook(request, token: str):
         remote_jid = key_data.get("remoteJid", "")
         message_id = key_data.get("id", "")
         message_type = body.get("data", {}).get("messageType", "conversation")
-        conversation = body.get("data", {}).get("message", {}).get("conversation", "")
+        message_text = _extract_message_text(body)
 
         if not remote_jid:
             return JsonResponse({"status": "no_jid"}, status=200)
@@ -43,8 +68,8 @@ def whatsapp_webhook(request, token: str):
         if message_type == "audioMessage":
             process_audio_message.delay(remote_jid, instance_key, message_id)
         else:
-            if conversation.strip():
-                process_whatsapp_message.delay(remote_jid, conversation)
+            if message_text:
+                process_whatsapp_message.delay(remote_jid, message_text)
 
         return JsonResponse({"status": "queued"})
 
