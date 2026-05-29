@@ -32,6 +32,11 @@ def process_whatsapp_message(self, remote_jid: str, message: str):
         return response
     except Exception as exc:
         logger.error("Agent failed for %s: %s", remote_jid, exc)
+        send_whatsapp_message(
+            remote_jid,
+            "Desculpe, tivemos um problema ao processar sua mensagem. "
+            "Tente novamente em alguns instantes.",
+        )
         raise
 
 

@@ -4,6 +4,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from .utils import resolve_reply_jid
+
 logger = logging.getLogger(__name__)
 
 
@@ -53,15 +55,25 @@ def whatsapp_webhook(request, token: str):
         body = data.get("body", data)
         instance_key = body.get("instance", settings.EVOLUTION_INSTANCE)
         key_data = body.get("data", {}).get("key", {})
-        remote_jid = key_data.get("remoteJid", "")
+        remote_jid = resolve_reply_jid(key_data)
         message_id = key_data.get("id", "")
         message_type = body.get("data", {}).get("messageType", "conversation")
         message_text = _extract_message_text(body)
+        from_me = key_data.get("fromMe", False)
 
         if not remote_jid:
             return JsonResponse({"status": "no_jid"}, status=200)
 
-        logger.info("Webhook received from %s (type=%s)", remote_jid, message_type)
+        if from_me:
+            logger.info("Ignoring outgoing message (fromMe=true) for %s", remote_jid)
+            return JsonResponse({"status": "ignored_outgoing"})
+
+        logger.info(
+            "Webhook received from %s (type=%s, text=%.40s)",
+            remote_jid,
+            message_type,
+            message_text,
+        )
 
         from .tasks import process_whatsapp_message, process_audio_message
 
@@ -70,6 +82,13 @@ def whatsapp_webhook(request, token: str):
         else:
             if message_text:
                 process_whatsapp_message.delay(remote_jid, message_text)
+            else:
+                logger.warning(
+                    "Empty message text from %s (type=%s)",
+                    remote_jid,
+                    message_type,
+                )
+                return JsonResponse({"status": "empty_message"})
 
         return JsonResponse({"status": "queued"})
 
