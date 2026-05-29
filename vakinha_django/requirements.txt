@@ -1,21 +1,39 @@
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+# Django e extensões
+django>=4.2
+djangorestframework>=3.14.0
+django-crispy-forms>=2.0
+crispy-tailwind>=0.5.0
+django-celery-results>=2.5.0
 
-        qs = (
-            Produto.objects.select_related("categoria", "fornecedor").order_by("nome")
-        )
-        busca = self.request.GET.get("q", "").strip()
-        categoria_raw = self.request.GET.get("categoria", "").strip()
-        categoria_atual = None
-        if categoria_raw and categoria_raw.isdigit():
-            categoria_atual = int(categoria_raw)
-            qs = qs.filter(categoria_id=categoria_atual)
-        if busca:
-            qs = qs.filter(
-                Q(nome__icontains=busca) )
-        context["produtos"] = qs
-        context["categorias"] = Categoria.objects.order_by("nome")
-        context["busca_q"] = busca
-        context["categoria_atual"] = categoria_atual or categoria_raw
+# Banco de dados
+psycopg2-binary>=2.9.0
+dj-database-url>=2.0.0
 
-        return context
+# Task Queue e Cache
+celery>=5.3.0
+redis>=5.0.0
+
+# Servidor e deployment
+gunicorn>=21.0.0
+whitenoise>=6.6.0
+
+# Configuração e utilitários
+python-decouple>=3.8
+python-dotenv>=1.0.0
+requests>=2.31.0
+pillow>=10.0.0
+
+# Pagamentos
+mercadopago>=2.0.0
+
+# IA e LLMs
+agno>=2.0.0
+google-generativeai>=0.3.0
+
+# FastAPI (para agents WhatsApp)
+fastapi>=0.109.0
+uvicorn>=0.27.0
+pydantic>=2.0.0
+
+# Utilities
+python-dateutil>=2.8.0
