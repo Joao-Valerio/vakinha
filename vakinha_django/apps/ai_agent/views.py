@@ -78,19 +78,19 @@ def whatsapp_webhook(request, token: str):
         from .tasks import process_whatsapp_message, process_audio_message
 
         if message_type == "audioMessage":
-            process_audio_message.delay(remote_jid, instance_key, message_id)
+            # .run() executa na hora (Vercel não tem worker Celery)
+            process_audio_message.run(remote_jid, instance_key, message_id)
+        elif message_text:
+            process_whatsapp_message.run(remote_jid, message_text)
         else:
-            if message_text:
-                process_whatsapp_message.delay(remote_jid, message_text)
-            else:
-                logger.warning(
-                    "Empty message text from %s (type=%s)",
-                    remote_jid,
-                    message_type,
-                )
-                return JsonResponse({"status": "empty_message"})
+            logger.warning(
+                "Empty message text from %s (type=%s)",
+                remote_jid,
+                message_type,
+            )
+            return JsonResponse({"status": "empty_message"})
 
-        return JsonResponse({"status": "queued"})
+        return JsonResponse({"status": "processed"})
 
     except Exception as exc:
         logger.error("Webhook processing error: %s", exc)

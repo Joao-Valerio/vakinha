@@ -54,12 +54,11 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 _celery_eager_raw = os.environ.get("CELERY_EAGER", "").strip()
 if _celery_eager_raw:
     _celery_eager = _celery_eager_raw.lower() in ("1", "true", "yes")
+elif os.environ.get("VERCEL") == "1":
+    # Vercel: sempre eager (não há worker)
+    _celery_eager = True
 else:
-    # Na Vercel, sem REDIS_URL: executa tasks na mesma requisição do webhook
-    _celery_eager = (
-        os.environ.get("VERCEL") == "1"
-        and not (os.environ.get("REDIS_URL") or "").strip()
-    )
+    _celery_eager = not (os.environ.get("REDIS_URL") or "").strip()
 
 CELERY_TASK_ALWAYS_EAGER = _celery_eager
 if CELERY_TASK_ALWAYS_EAGER:
